@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npx husky install",
-    "migrations": "node src/db/postgres/migrations/exec.js"
+    "migrations": "node src/db/postgres/migrations/exec.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "globals": "^17.7.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.8",
+    "nodemon": "^3.1.14",
     "prettier": "^3.9.5"
   },
   "dependencies": {

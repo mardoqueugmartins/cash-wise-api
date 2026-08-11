@@ -5,10 +5,19 @@ import { PostgresHelper } from './src/db/postgres/helper.js'
 
 const app = express()
 
-app.get('/', async (req, res) => {
+app.use(express.json())
+
+app.get('/api/users', async (req, res) => {
     const results = await PostgresHelper.query('SELECT * FROM users;')
 
-    res.send(JSON.stringify(results))
+    res.json(results)
 })
 
-app.listen(3000, () => console.log('listening on port 3000'))
+app.post('/api/users', async (req, res) => {
+    console.log(req.body)
+    res.status(201).send('User created')
+})
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server running on port ${process.env.PORT}`)
+})
