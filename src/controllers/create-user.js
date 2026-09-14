@@ -1,10 +1,12 @@
 import { CreateUserCase } from '../repositories/use-cases/create-user.js'
+import validator from 'validator'
 
 export class CreateUserController {
     async execute(httprequest) {
         try {
             const params = httprequest.body
 
+            // validar a requisição (campos obrigatórios, tamanho de senha e e-mail)
             const requiredFields = [
                 'first_name',
                 'last_name',
@@ -23,6 +25,32 @@ export class CreateUserController {
                 }
             }
 
+            // validar senha
+            const passwordIsValid = params.password.length < 6
+            if (passwordIsValid) {
+                return {
+                    statusCode: 400,
+                    body: {
+                        errorMessage:
+                            'Password must be at least 6 characteres.',
+                    },
+                }
+            }
+
+            // validar e-mail com validator
+            const emailIsValid = validator.isEmail(params.email)
+
+            if (!emailIsValid) {
+                return {
+                    statusCode: 400,
+                    body: {
+                        errorMessage:
+                            'Invalid e-mail. Please provide a valid one.',
+                    },
+                }
+            }
+
+            // chamar o use case
             const createUserUseCase = new CreateUserCase()
 
             const createdUser = await createUserUseCase.execute(params)
