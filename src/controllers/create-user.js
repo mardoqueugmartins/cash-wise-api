@@ -1,5 +1,6 @@
 import { CreateUserCase } from '../repositories/use-cases/create-user.js'
 import validator from 'validator'
+import { badRequest, created, serverError } from './helpers.js'
 
 export class CreateUserController {
     async execute(httprequest) {
@@ -16,58 +17,37 @@ export class CreateUserController {
 
             for (const field of requiredFields) {
                 if (!params[field] || params[field].trim() === '') {
-                    return {
-                        statusCode: 400,
-                        body: {
-                            error: `Missing required field: ${field}`,
-                        },
-                    }
+                    return badRequest({
+                        message: `Missing required field: ${field}`,
+                    })
                 }
             }
 
             // validar senha
             const passwordIsValid = params.password.length < 6
             if (passwordIsValid) {
-                return {
-                    statusCode: 400,
-                    body: {
-                        errorMessage:
-                            'Password must be at least 6 characteres.',
-                    },
-                }
+                return badRequest({
+                    message: 'Password must be at least 6 characteres.',
+                })
             }
 
             // validar e-mail com validator
             const emailIsValid = validator.isEmail(params.email)
 
             if (!emailIsValid) {
-                return {
-                    statusCode: 400,
-                    body: {
-                        errorMessage:
-                            'Invalid e-mail. Please provide a valid one.',
-                    },
-                }
+                return badRequest({
+                    message: 'Invalid e-mail. Please provide a valid one.',
+                })
             }
 
             // chamar o use case
             const createUserUseCase = new CreateUserCase()
 
             const createdUser = await createUserUseCase.execute(params)
-
-            return {
-                statusCode: 201,
-                body: createdUser,
-            }
+            return created(createdUser)
         } catch (error) {
             console.log(error)
-
-            return {
-                statusCode: 500,
-                body: {
-                    error: 'Internal server error',
-                },
-            }
+            return serverError()
         }
     }
 }
